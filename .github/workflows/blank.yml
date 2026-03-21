@@ -1,0 +1,18 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Compile Serial
+      run: gcc -fopenmp -O2 src/serial/sudoku-serial.c -o sudoku-serial
+      # Nota: Ajusta o caminho 'src/serial/...' conforme a tua pasta
