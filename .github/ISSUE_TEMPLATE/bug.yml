@@ -1,7 +1,7 @@
 name: "🐛 Relato de Bug"
 description: Algo não está a funcionar como devia.
-title: "[BUG]: "
-labels: ["tipo: bug", "prioridade: alta"]
+title: "bug: "
+labels: ["bug"]
 body:
   - type: textarea
     id: bug_description

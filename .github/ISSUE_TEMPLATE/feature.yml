@@ -1,7 +1,7 @@
 name: "🚀 Nova Funcionalidade"
 description: Propor uma nova parte do código ou lógica.
-title: "[FEAT]: "
-labels: ["tipo: funcionalidade"]
+title: "feat: "
+labels: ["enhancement"]
 body:
   - type: textarea
     id: description
