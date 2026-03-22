@@ -1,0 +1,46 @@
+name: "🚀 Nova Funcionalidade"
+description: Propor uma nova parte do código ou lógica.
+title: "[FEAT]: "
+labels: ["tipo: funcionalidade"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "📝 Descrição"
+      description: "O que esta funcionalidade faz?"
+      placeholder: "Ex: Implementar a lógica de leitura do ficheiro de entrada."
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: "⚙️ Requisitos"
+      description: "Lista de requisitos técnicos."
+      placeholder: "- Deve suportar L até 9\n- Deve usar alocação dinâmica"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: "✅ Critérios de Aceitação"
+      description: "Como sabemos que a tarefa está pronta?"
+      placeholder: "- Passar no teste 4x4\n- Tempo impresso no stderr"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: include_signature
+    attributes:
+      label: "✒️ Assinatura de Código"
+      options:
+        - label: "Esta tarefa requer a definição de uma assinatura de função em C?"
+
+  - type: textarea
+    id: code_signature
+    attributes:
+      label: "💻 Protótipo da Função (C)"
+      description: "Se selecionou a opção acima, defina aqui como a função deve ser chamada."
+      placeholder: "int solve_sudoku(int **board, int n);"
+      render: c

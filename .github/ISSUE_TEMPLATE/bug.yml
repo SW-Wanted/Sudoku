@@ -1,0 +1,28 @@
+name: "🐛 Relato de Bug"
+description: Algo não está a funcionar como devia.
+title: "[BUG]: "
+labels: ["tipo: bug", "prioridade: alta"]
+body:
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: "❌ Descrição do Problema"
+      description: "O que está a acontecer de errado?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "🚶 Passos para Reproduzir"
+      description: "Como chegamos ao erro?"
+      placeholder: "1. Executar com input_9x9.txt\n2. Observar Segmentation Fault"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: "📊 Comportamento Esperado vs Atual"
+    validations:
+      required: true
