@@ -6,9 +6,9 @@ all: sudoku-serial
 obj:
 	mkdir -p obj
 
-obj/sudoku-serial.o: src/serial/sudoku-serial.c
+obj/sudoku-serial.o: sudoku/serial/sudoku-serial.c
 	mkdir -p obj
-	$(CC) $(CFLAGS) -c src/serial/sudoku-serial.c -o obj/sudoku-serial.o
+	$(CC) $(CFLAGS) -c sudoku/serial/sudoku-serial.c -o obj/sudoku-serial.o
 
 sudoku-serial: obj/sudoku-serial.o
 	$(CC) $(CFLAGS) obj/sudoku-serial.o -o sudoku-serial
