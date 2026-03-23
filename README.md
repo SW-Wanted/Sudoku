@@ -4,9 +4,9 @@ Projecto de Computação Paralela e Distribuída - ISPTEC 2025/2026
 
 ---
 
-## 👥 Grupo [4]
+## 👥 Grupo 04
 
-- [Carlos Tchípia - 20221196]
+- [Carlos Tchípia - 20221196
 - [Emanuel dos Santos - 20230429]
 - [Líria Bá - 20230237]
 
