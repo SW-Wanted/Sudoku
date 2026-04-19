@@ -1,6 +1,6 @@
 # Sudoku
 
-Este projeto foi criado como parte da **Componente Prática do Exame** da disciplina de **Computação Paralela e Distribuída** durante o ano lectivo **2025/2026** na turma **EIN6_M3** pelo [**Grupo 04**](./MEMBERS.md).
+Este projeto foi criado como parte da **Componente Prática do Exame** da disciplina de **Computação Paralela e Distribuída** durante o ano lectivo **2025/2026** na turma **EIN6_M3** pelo [**Grupo 04**](./CONTRIBUTING.md).
 
 ---
 ## 📋 Sobre o Projecto
