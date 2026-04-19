@@ -1,0 +1,49 @@
+name: "📄 Documentação"
+description: Propor documentação, relatórios ou guias.
+title: "docs: "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: doc_description
+    attributes:
+      label: "📝 Descrição"
+      description: "O que será documentado?"
+      placeholder: "Ex: Relatório de desempenho das versões paralelas."
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: "📌 Escopo"
+      description: "O que deve ser incluído e excluído?"
+      placeholder: "- Incluir métricas de performance\n- Excluir benchmarks não oficiais"
+    validations:
+      required: true
+
+  - type: textarea
+    id: data_sources
+    attributes:
+      label: "📚 Fontes/Dados"
+      description: "Indique dados, medições ou referências necessárias."
+      placeholder: "- Tempos experimentais para 1/2/4/8 tarefas\n- Instâncias de amostra fornecidas"
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: "📄 Entregável"
+      description: "Formato e caminho do documento final."
+      placeholder: "sudoku-report.pdf"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: "✅ Critérios de Aceitação"
+      description: "Como sabemos que o documento está pronto?"
+      placeholder: "- PDF final com tabelas e gráficos\n- Discussão de sincronização e balanceamento"
+    validations:
+      required: true
