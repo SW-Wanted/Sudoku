@@ -1,5 +1,5 @@
 CC     = gcc
-CFLAGS = -Wall -Wextra -O2 -fopenmp
+CFLAGS = -Wall -Wextra -Werror -O2 -fopenmp -g
 
 all: sudoku-serial
 
