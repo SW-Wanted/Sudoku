@@ -1,26 +1,16 @@
-# Sudoku - Solucionador
+# Sudoku
 
-Projecto de Computação Paralela e Distribuída - ISPTEC 2025/2026
+Este projeto foi criado como parte da componente prática do exame da disciplina de **Computação Paralela e Distribuída** durante o ano lectivo **2025/2026** na turma **EIN6_M3** pelo [**Grupo 04**](./MEMBERS.md)
 
 ---
-
-## 👥 Grupo 04
- 
-| Nome | Matrícula |
-|---|---|
-| Carlos Tchípia | 20221196 |
-| Emanuel dos Santos | 20230429 |
-| Líria Bá | 20230237 |
----
-
 ## 📋 Sobre o Projecto
 
-Este trabalho implementa um programa que resolve quebra-cabeças Sudoku. Começamos com uma versão simples (serial) e depois vamos criar versões paralelas usando OpenMP e MPI.
+Este trabalho implementa um programa que resolve quebra-cabeças Sudoku.
 
 | Fase | Versão | Tecnologia | Prazo |
 |---|---|---|---|
 | ✅ V0 | Serial |  | 23 Mar 2026 |
-| 🔲 V1 | Paralela | OpenMP | 06 Abr 2026 |
+| 🔲 V1 | Paralela | OpenMP | 21 Abr 2026 |
 | 🔲 V2 | Distribuída | MPI | 18 Mai 2026 |
 
 ---
@@ -37,7 +27,12 @@ CPD-MiniProjectos/
 ├── tests/
 │   ├── input_4x4.txt
 │   ├── input_4x4_impossible.txt
-│   └── input_9x9.txt
+│   ├── input_9x9.txt
+│   ├── 9x9.txt
+│   ├── 9x9-nosol.txt
+│   ├── 16x16.txt
+│   ├── 16x16-nosol.txt
+│   └── 16x16-zeros.txt
 ├── Makefile
 └── README.md
 ```
