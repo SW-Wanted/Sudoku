@@ -22,6 +22,8 @@ CPD-MiniProjectos/
 ├── docs/
 │   └── CPD2025_2026-Projecto-v0.pdf
 ├── sudoku/
+│   ├── paralela
+│   │   └── sudoku-omp.c
 │   └── serial/
 │       └── sudoku-serial.c
 ├── tests/
