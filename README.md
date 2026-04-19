@@ -130,7 +130,7 @@ Nenhuma solução
 
 ## 🧪 Testes Realizados
 
-Testamos com três tipos de casos:
+Testamos com oito tipos de casos:
 
 ### 1. **input_4x4.txt** - Sudoku Básico
 ```text
@@ -175,8 +175,28 @@ Este Sudoku é impossível porque:
 ```
 - Demora alguns segundos dependendo da dificuldade
 - Sudoku 9×9 com solução válida
+
+### 4. **9x9.txt** - Sudoku 9×9 (esparso)
+- Instância 9×9 com poucas pistas distribuídas
+- Útil para medir esforço de pesquisa com baixa restrição
+
+### 5. **9x9-nosol.txt** - Sudoku 9×9 sem solução
+- Instância propositalmente impossível
+- Valida deteção de inconsistência sem solução
+
+### 6. **16x16.txt** - Sudoku 16×16
+- Instância 16×16 (L=4) para testar escalabilidade
+- Pode demorar significativamente mais que 9×9
+
+### 7. **16x16-nosol.txt** - Sudoku 16×16 sem solução
+- Caso impossível em dimensão maior
+- Verifica deteção de falhas em 16×16
+
+### 8. **16x16-zeros.txt** - Sudoku 16×16 vazio (stress)
+- Sem pistas iniciais (pior caso)
+- Útil para stress e medições de desempenho
 ---
- 
+  
 ### Comandos de Testes
  
 4×4 com solução:
@@ -189,11 +209,32 @@ make test2
 ```
 9×9 com solução:
 ```bash
-make test3
+make test3-omp
 ```
-executa os três testes:
+executa os oitos testes (versão serial):
 ```bash
 make test
+```
+
+executa os oitos testes (versão paralela):
+```bash
+make test-omp
+```
+
+Outros testes (execução directa):
+```bash
+./sudoku-serial tests/9x9.txt
+./sudoku-serial tests/9x9-nosol.txt
+./sudoku-serial tests/16x16.txt
+./sudoku-serial tests/16x16-nosol.txt
+./sudoku-serial tests/16x16-zeros.txt
+```
+```bash
+./sudoku-omp tests/9x9.txt
+./sudoku-omp tests/9x9-nosol.txt
+./sudoku-omp tests/16x16.txt
+./sudoku-omp tests/16x16-nosol.txt
+./sudoku-omp tests/16x16-zeros.txt
 ```
 
 ### Separar saída e tempo:
