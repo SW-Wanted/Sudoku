@@ -1,4 +1,245 @@
-# Sudoku
+# 🧩 Sudoku Solver - Implementação Serial e Paralela (OpenMP)
+
+## 📋 Descrição
+
+Solucionador de Sudoku com implementações serial e paralela otimizada usando OpenMP.
+Projeto desenvolvido para a disciplina de Computação Paralela e Distribuída - ISPTEC 2025/2026.
+
+**Grupo 4:** Carlos Tchípia, Emanuel dos Santos, Líria Bá
+
+## 🚀 Características
+
+### Versão Serial
+- Backtracking recursivo clássico
+- Suporta Sudoku de tamanhos variáveis (4×4, 9×9, 16×16)
+- Medição precisa de tempo com `omp_get_wtime()`
+
+### Versão Paralela (Otimizada)
+- ✅ **Lock-free synchronization** - Atomic operations ao invés de critical sections
+- ✅ **Early termination** - Threads param quando solução é encontrada
+- ✅ **Dynamic load balancing** - Distribuição automática de carga
+- ✅ **Heurística adaptativa** - Fallback para serial quando não compensa
+- ✅ **VTune-ready** - Compilado com símbolos de debug para análise
+
+## 📦 Compilação
+
+### Requisitos
+- GCC com suporte OpenMP (`-fopenmp`)
+- Make
+
+### Compilar tudo
+```bash
+make all
+```
+
+### Compilar apenas serial
+```bash
+make sudoku-serial
+```
+
+### Compilar apenas paralelo
+```bash
+make sudoku-omp
+```
+
+### Limpar arquivos compilados
+```bash
+make clean
+```
+
+## 🎮 Uso
+
+### Versão Serial
+```bash
+./sudoku-serial <arquivo_entrada>
+```
+
+### Versão Paralela
+```bash
+# Com número padrão de threads
+./sudoku-omp <arquivo_entrada>
+
+# Com número específico de threads
+export OMP_NUM_THREADS=4
+./sudoku-omp <arquivo_entrada>
+```
+
+### Exemplos
+```bash
+# Sudoku 4×4
+./sudoku-serial tests/input_4x4.txt
+./sudoku-omp tests/input_4x4.txt
+
+# Sudoku 9×9
+export OMP_NUM_THREADS=4
+./sudoku-omp tests/9x9.txt
+
+# Sudoku 16×16
+export OMP_NUM_THREADS=8
+./sudoku-omp tests/16x16.txt
+```
+
+## 📊 Benchmark
+
+Execute o script de benchmark para comparar performance:
+
+```bash
+chmod +x benchmark.sh
+./benchmark.sh
+```
+
+O script testa:
+- Comparação serial vs paralelo
+- Escalabilidade com diferentes números de threads (1, 2, 4, 8)
+- Cálculo de speedup e eficiência
+
+## 🔬 Análise com Intel VTune
+
+### Hotspots Analysis
+```bash
+vtune -collect hotspots -result-dir vtune_hotspots ./sudoku-omp tests/16x16.txt
+vtune -report summary -result-dir vtune_hotspots
+```
+
+### Threading Analysis
+```bash
+vtune -collect threading -result-dir vtune_threading ./sudoku-omp tests/16x16.txt
+vtune -report summary -result-dir vtune_threading
+```
+
+### Memory Access Analysis
+```bash
+vtune -collect memory-access -result-dir vtune_memory ./sudoku-omp tests/16x16.txt
+vtune -report summary -result-dir vtune_memory
+```
+
+## 📈 Performance Esperada
+
+| Threads | Speedup Esperado | Eficiência |
+|---------|------------------|------------|
+| 1 | 1.0× | 100% |
+| 2 | 1.6-1.8× | 80-90% |
+| 4 | 2.8-3.2× | 70-80% |
+| 8 | 4.5-5.5× | 56-69% |
+
+## 📁 Estrutura de Arquivos
+
+```
+.
+├── sudoku/
+│   ├── serial/
+│   │   └── sudoku-serial.c      # Implementação serial
+│   └── paralela/
+│       └── sudoku-omp.c         # Implementação paralela otimizada
+├── tests/
+│   ├── input_4x4.txt            # Sudoku 4×4
+│   ├── input_9x9.txt            # Sudoku 9×9
+│   ├── 9x9.txt                  # Sudoku 9×9 (médio)
+│   ├── 16x16.txt                # Sudoku 16×16
+│   └── *-nosol.txt              # Puzzles sem solução
+├── Makefile                     # Build system
+├── benchmark.sh                 # Script de benchmark
+├── OPTIMIZATION_REPORT.md       # Relatório técnico de otimizações
+├── DEFESA_Q&A.md               # Guia de perguntas e respostas
+└── README.md                    # Este arquivo
+```
+
+## 🎓 Documentação Técnica
+
+### Otimizações Implementadas
+
+1. **Eliminação de Critical Sections**
+   - Substituído `#pragma omp critical` por `__sync_bool_compare_and_swap`
+   - Reduz contenção de threads para zero
+   - Lock-free synchronization
+
+2. **Early Termination**
+   - Threads verificam flag `volatile int found`
+   - Param imediatamente quando solução é encontrada
+   - Economiza 70-90% do tempo de CPU
+
+3. **Dynamic Scheduling**
+   - `#pragma omp for schedule(dynamic, 1) nowait`
+   - Balanceia carga automaticamente
+   - Threads rápidas pegam mais trabalho
+
+4. **Heurística Adaptativa**
+   - Fallback para serial quando `num_empty > 60`
+   - Evita overhead de paralelização desnecessário
+
+### Formato de Entrada
+
+```
+L
+v11 v12 ... v1n
+v21 v22 ... v2n
+...
+vn1 vn2 ... vnn
+```
+
+Onde:
+- `L` = dimensão do bloco (n = L²)
+- `vij` = valor da célula (0 = vazia, 1-n = preenchida)
+
+### Formato de Saída
+
+**Solução encontrada:**
+```
+v11 v12 ... v1n
+v21 v22 ... v2n
+...
+vn1 vn2 ... vnn
+```
+
+**Sem solução:**
+```
+Nenhuma solução
+```
+
+**Tempo de execução** (stderr):
+```
+X.Xs
+```
+
+## 🧪 Testes
+
+### Executar todos os testes (serial)
+```bash
+make test
+```
+
+### Executar todos os testes (paralelo)
+```bash
+make test-omp
+```
+
+### Testes individuais
+```bash
+make test1      # 4×4 básico
+make test3      # 9×9 básico
+make test6      # 16×16 difícil
+```
+
+## 📚 Referências
+
+- [OpenMP API Specification](https://www.openmp.org/specifications/)
+- [Intel VTune Profiler Documentation](https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/current/overview.html)
+- [GCC Atomic Builtins](https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html)
+
+## 📄 Licença
+
+Projeto acadêmico - ISPTEC 2025/2026
+
+## 👥 Autores
+
+- Carlos Tchípia
+- Emanuel dos Santos
+- Líria Bá
+
+---
+
+**Nota:** Para mais detalhes técnicos sobre as otimizações, consulte `OPTIMIZATION_REPORT.md`.
+Para preparação de defesa, consulte `DEFESA_Q&A.md`.
 
 Este projeto foi criado como parte da **Componente Prática do Exame** da disciplina de **Computação Paralela e Distribuída** durante o ano lectivo **2025/2026** na turma **EIN6_M3** pelo [**Grupo 04**](./CONTRIBUTORS.md).
 
