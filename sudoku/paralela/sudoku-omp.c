@@ -510,7 +510,7 @@ int main(int argc, char *argv[]) {
     int solved = solve_sudoku_parallel(s);
     exec_time += omp_get_wtime();
 
-    fprintf(stderr, "%.1fs\n", exec_time);
+    fprintf(stderr, "%.1fs - %d\n", exec_time, omp_get_num_threads());
 
     if (solved)
         print_sudoku(s);
