@@ -24,7 +24,6 @@ CPD-Sudoku/
 │   └── sudoku-subject.pdf
 |
 ├── sudoku/
-│   ├── sudoku-mpi.c
 │   ├── sudoku-omp.c
 │   └── sudoku-serial.c
 |
