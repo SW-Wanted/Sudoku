@@ -66,10 +66,10 @@
 /* =========================================================================
  * Constantes
  * ========================================================================= */
-#define TAG_SOLUCAO   10     /**< worker → mestre: tabuleiro resolvido    */
-#define TAG_SEM_SOL   11     /**< worker → mestre: sem solução encontrada */
-#define MAX_TASKS     4096   /**< capacidade máxima do array de sub-problemas */
-#define EXPAND_DEPTH  4      /**< níveis de expansão da árvore de pesquisa   */
+#define TAG_SOLUCAO 10 /**< worker → mestre: tabuleiro resolvido    */
+#define TAG_SEM_SOL 11 /**< worker → mestre: sem solução encontrada */
+#define MAX_TASKS 4096 /**< capacidade máxima do array de sub-problemas */
+#define EXPAND_DEPTH 4 /**< níveis de expansão da árvore de pesquisa   */
 
 /* =========================================================================
  * Estruturas de Dados
@@ -84,12 +84,12 @@
  * eliminando os três ciclos da versão serial (linha + coluna + bloco).
  */
 typedef struct {
-    int *grid;      /**< Array plano n*n, alocado dinamicamente.          */
-    int *row_mask;  /**< Bitmask de números usados por linha.             */
-    int *col_mask;  /**< Bitmask de números usados por coluna.            */
-    int *box_mask;  /**< Bitmask de números usados por bloco L×L.         */
-    int  n;         /**< Dimensão do tabuleiro (n×n).                     */
-    int  L;         /**< Dimensão de cada bloco interno (L×L), n = L².   */
+  int *grid;     /**< Array plano n*n, alocado dinamicamente.          */
+  int *row_mask; /**< Bitmask de números usados por linha.             */
+  int *col_mask; /**< Bitmask de números usados por coluna.            */
+  int *box_mask; /**< Bitmask de números usados por bloco L×L.         */
+  int n;         /**< Dimensão do tabuleiro (n×n).                     */
+  int L;         /**< Dimensão de cada bloco interno (L×L), n = L².   */
 } Sudoku;
 
 /**
@@ -100,36 +100,36 @@ typedef struct {
  * sem partilha de memória de escrita com outros sub-problemas.
  */
 typedef struct {
-    int *grid;      /**< Array plano n*n com estado parcial.  */
-    int *row_mask;  /**< Cópia das bitmasks de linha.         */
-    int *col_mask;  /**< Cópia das bitmasks de coluna.        */
-    int *box_mask;  /**< Cópia das bitmasks de bloco.         */
+  int *grid;     /**< Array plano n*n com estado parcial.  */
+  int *row_mask; /**< Cópia das bitmasks de linha.         */
+  int *col_mask; /**< Cópia das bitmasks de coluna.        */
+  int *box_mask; /**< Cópia das bitmasks de bloco.         */
 } SubProblem;
 
 /* =========================================================================
  * Protótipos
  * ========================================================================= */
 
-Sudoku     *create_sudoku(int L);
-void        free_sudoku(Sudoku *s);
-int         read_sudoku(const char *filename, Sudoku **s);
-void        print_sudoku(Sudoku *s);
+Sudoku *create_sudoku(int L);
+void free_sudoku(Sudoku *s);
+int read_sudoku(const char *filename, Sudoku **s);
+void print_sudoku(Sudoku *s);
 SubProblem *create_subproblem(int *grid, int *row_mask, int *col_mask,
                               int *box_mask, int n);
-void        free_subproblem(SubProblem *sp);
-void        generate_tasks(int *grid, int *row_mask, int *col_mask,
-                           int *box_mask, int n, int L, int depth,
-                           SubProblem **tasks, int *n_tasks, int max_t);
-int         solve_with_cutoff(SubProblem *sp, int n, int L,
-                              volatile int *found);
+void free_subproblem(SubProblem *sp);
+void generate_tasks(int *grid, int *row_mask, int *col_mask, int *box_mask,
+                    int n, int L, int depth, SubProblem **tasks, int *n_tasks,
+                    int max_t);
+int solve_with_cutoff(SubProblem *sp, int n, int L, volatile int *found);
 
 /* =========================================================================
  * Auxiliar: índice do bloco
  * ========================================================================= */
 
-/** Calcula o índice linear do bloco L×L ao qual a célula (row, col) pertence. */
+/** Calcula o índice linear do bloco L×L ao qual a célula (row, col) pertence.
+ */
 static inline int box_index(int row, int col, int L) {
-    return (row / L) * L + (col / L);
+  return (row / L) * L + (col / L);
 }
 
 /* =========================================================================
@@ -146,23 +146,27 @@ static inline int box_index(int row, int col, int L) {
  * @return    Ponteiro para a estrutura criada, ou NULL em caso de erro.
  */
 Sudoku *create_sudoku(int L) {
-    Sudoku *s = (Sudoku *) malloc(sizeof(Sudoku));
-    if (!s) return NULL;
+  Sudoku *s = (Sudoku *)malloc(sizeof(Sudoku));
+  if (!s)
+    return NULL;
 
-    s->L = L;
-    s->n = L * L;
+  s->L = L;
+  s->n = L * L;
 
-    s->grid     = (int *) calloc(s->n * s->n, sizeof(int));
-    s->row_mask = (int *) calloc(s->n, sizeof(int));
-    s->col_mask = (int *) calloc(s->n, sizeof(int));
-    s->box_mask = (int *) calloc(s->n, sizeof(int));
+  s->grid = (int *)calloc(s->n * s->n, sizeof(int));
+  s->row_mask = (int *)calloc(s->n, sizeof(int));
+  s->col_mask = (int *)calloc(s->n, sizeof(int));
+  s->box_mask = (int *)calloc(s->n, sizeof(int));
 
-    if (!s->grid || !s->row_mask || !s->col_mask || !s->box_mask) {
-        free(s->grid); free(s->row_mask);
-        free(s->col_mask); free(s->box_mask);
-        free(s); return NULL;
-    }
-    return s;
+  if (!s->grid || !s->row_mask || !s->col_mask || !s->box_mask) {
+    free(s->grid);
+    free(s->row_mask);
+    free(s->col_mask);
+    free(s->box_mask);
+    free(s);
+    return NULL;
+  }
+  return s;
 }
 
 /**
@@ -174,12 +178,13 @@ Sudoku *create_sudoku(int L) {
  * @param s  Ponteiro para a estrutura a libertar.
  */
 void free_sudoku(Sudoku *s) {
-    if (!s) return;
-    free(s->grid);
-    free(s->row_mask);
-    free(s->col_mask);
-    free(s->box_mask);
-    free(s);
+  if (!s)
+    return;
+  free(s->grid);
+  free(s->row_mask);
+  free(s->col_mask);
+  free(s->box_mask);
+  free(s);
 }
 
 /* =========================================================================
@@ -199,35 +204,45 @@ void free_sudoku(Sudoku *s) {
  * @return           1 em caso de sucesso, 0 em caso de erro.
  */
 int read_sudoku(const char *filename, Sudoku **s) {
-    FILE *fp = fopen(filename, "r");
-    if (!fp) {
-        fprintf(stderr, "Erro ao abrir ficheiro: %s\n", filename);
-        return 0;
-    }
+  FILE *fp = fopen(filename, "r");
+  if (!fp) {
+    fprintf(stderr, "Erro ao abrir ficheiro: %s\n", filename);
+    return 0;
+  }
 
-    int L;
-    if (fscanf(fp, "%d", &L) != 1 || L < 2 || L > 9) {
-        fprintf(stderr, "Valor de L inválido\n");
-        fclose(fp); return 0;
-    }
-
-    *s = create_sudoku(L);
-    if (!*s) { fclose(fp); return 0; }
-
-    int n = (*s)->n;
-    for (int i = 0; i < n * n; i++) {
-        if (fscanf(fp, "%d", &(*s)->grid[i]) != 1) {
-            fprintf(stderr, "Erro ao ler célula %d\n", i);
-            free_sudoku(*s); *s = NULL; fclose(fp); return 0;
-        }
-        if ((*s)->grid[i] < 0 || (*s)->grid[i] > n) {
-            fprintf(stderr, "Valor inválido na célula %d\n", i);
-            free_sudoku(*s); *s = NULL; fclose(fp); return 0;
-        }
-    }
-
+  int L;
+  if (fscanf(fp, "%d", &L) != 1 || L < 2 || L > 9) {
+    fprintf(stderr, "Valor de L inválido\n");
     fclose(fp);
-    return 1;
+    return 0;
+  }
+
+  *s = create_sudoku(L);
+  if (!*s) {
+    fclose(fp);
+    return 0;
+  }
+
+  int n = (*s)->n;
+  for (int i = 0; i < n * n; i++) {
+    if (fscanf(fp, "%d", &(*s)->grid[i]) != 1) {
+      fprintf(stderr, "Erro ao ler célula %d\n", i);
+      free_sudoku(*s);
+      *s = NULL;
+      fclose(fp);
+      return 0;
+    }
+    if ((*s)->grid[i] < 0 || (*s)->grid[i] > n) {
+      fprintf(stderr, "Valor inválido na célula %d\n", i);
+      free_sudoku(*s);
+      *s = NULL;
+      fclose(fp);
+      return 0;
+    }
+  }
+
+  fclose(fp);
+  return 1;
 }
 
 /**
@@ -239,13 +254,14 @@ int read_sudoku(const char *filename, Sudoku **s) {
  * @param s  Ponteiro para a estrutura Sudoku com o tabuleiro preenchido.
  */
 void print_sudoku(Sudoku *s) {
-    for (int i = 0; i < s->n; i++) {
-        for (int j = 0; j < s->n; j++) {
-            printf("%d", s->grid[i * s->n + j]);
-            if (j < s->n - 1) printf(" ");
-        }
-        printf("\n");
+  for (int i = 0; i < s->n; i++) {
+    for (int j = 0; j < s->n; j++) {
+      printf("%d", s->grid[i * s->n + j]);
+      if (j < s->n - 1)
+        printf(" ");
     }
+    printf("\n");
+  }
 }
 
 /* =========================================================================
@@ -268,26 +284,30 @@ void print_sudoku(Sudoku *s) {
  */
 SubProblem *create_subproblem(int *grid, int *row_mask, int *col_mask,
                               int *box_mask, int n) {
-    SubProblem *sp = (SubProblem *) malloc(sizeof(SubProblem));
-    if (!sp) return NULL;
+  SubProblem *sp = (SubProblem *)malloc(sizeof(SubProblem));
+  if (!sp)
+    return NULL;
 
-    sp->grid     = (int *) malloc(n * n * sizeof(int));
-    sp->row_mask = (int *) malloc(n * sizeof(int));
-    sp->col_mask = (int *) malloc(n * sizeof(int));
-    sp->box_mask = (int *) malloc(n * sizeof(int));
+  sp->grid = (int *)malloc(n * n * sizeof(int));
+  sp->row_mask = (int *)malloc(n * sizeof(int));
+  sp->col_mask = (int *)malloc(n * sizeof(int));
+  sp->box_mask = (int *)malloc(n * sizeof(int));
 
-    if (!sp->grid || !sp->row_mask || !sp->col_mask || !sp->box_mask) {
-        free(sp->grid); free(sp->row_mask);
-        free(sp->col_mask); free(sp->box_mask);
-        free(sp); return NULL;
-    }
+  if (!sp->grid || !sp->row_mask || !sp->col_mask || !sp->box_mask) {
+    free(sp->grid);
+    free(sp->row_mask);
+    free(sp->col_mask);
+    free(sp->box_mask);
+    free(sp);
+    return NULL;
+  }
 
-    memcpy(sp->grid,     grid,     n * n * sizeof(int));
-    memcpy(sp->row_mask, row_mask, n * sizeof(int));
-    memcpy(sp->col_mask, col_mask, n * sizeof(int));
-    memcpy(sp->box_mask, box_mask, n * sizeof(int));
+  memcpy(sp->grid, grid, n * n * sizeof(int));
+  memcpy(sp->row_mask, row_mask, n * sizeof(int));
+  memcpy(sp->col_mask, col_mask, n * sizeof(int));
+  memcpy(sp->box_mask, box_mask, n * sizeof(int));
 
-    return sp;
+  return sp;
 }
 
 /**
@@ -296,12 +316,13 @@ SubProblem *create_subproblem(int *grid, int *row_mask, int *col_mask,
  * @param sp  Ponteiro para o SubProblem a libertar.
  */
 void free_subproblem(SubProblem *sp) {
-    if (!sp) return;
-    free(sp->grid);
-    free(sp->row_mask);
-    free(sp->col_mask);
-    free(sp->box_mask);
-    free(sp);
+  if (!sp)
+    return;
+  free(sp->grid);
+  free(sp->row_mask);
+  free(sp->col_mask);
+  free(sp->box_mask);
+  free(sp);
 }
 
 /* =========================================================================
@@ -331,52 +352,60 @@ void free_subproblem(SubProblem *sp) {
  * @param  max_t     Capacidade máxima do array tasks.
  */
 void generate_tasks(int *grid, int *row_mask, int *col_mask, int *box_mask,
-                    int n, int L, int depth,
-                    SubProblem **tasks, int *n_tasks, int max_t) {
+                    int n, int L, int depth, SubProblem **tasks, int *n_tasks,
+                    int max_t) {
 
-    if (*n_tasks >= max_t) return;
+  if (*n_tasks >= max_t)
+    return;
 
-    int valid_mask = (2 << n) - 2;
-    int row = -1, col = -1, min_cnt = n + 1;
+  int valid_mask = (2 << n) - 2;
+  int row = -1, col = -1, min_cnt = n + 1;
 
-    for (int i = 0; i < n && min_cnt > 1; i++) {
-        for (int j = 0; j < n && min_cnt > 1; j++) {
-            if (grid[i * n + j] != 0) continue;
-            int box = box_index(i, j, L);
-            int used = row_mask[i] | col_mask[j] | box_mask[box];
-            int cnt  = __builtin_popcount(valid_mask & ~used);
-            if (cnt == 0) return;   /* Forward checking: ramo morto — podar */
-            if (cnt < min_cnt) { min_cnt = cnt; row = i; col = j; }
-        }
-    }
-
-    if (row == -1 || depth == 0) {
-        tasks[*n_tasks] = create_subproblem(grid, row_mask, col_mask, box_mask, n);
-        if (tasks[*n_tasks]) (*n_tasks)++;
+  for (int i = 0; i < n && min_cnt > 1; i++) {
+    for (int j = 0; j < n && min_cnt > 1; j++) {
+      if (grid[i * n + j] != 0)
+        continue;
+      int box = box_index(i, j, L);
+      int used = row_mask[i] | col_mask[j] | box_mask[box];
+      int cnt = __builtin_popcount(valid_mask & ~used);
+      if (cnt == 0)
         return;
+      if (cnt < min_cnt) {
+        min_cnt = cnt;
+        row = i;
+        col = j;
+      }
     }
+  }
 
-    int box       = box_index(row, col, L);
-    int used      = row_mask[row] | col_mask[col] | box_mask[box];
-    int available = valid_mask & ~used;
+  if (row == -1 || depth == 0) {
+    tasks[*n_tasks] = create_subproblem(grid, row_mask, col_mask, box_mask, n);
+    if (tasks[*n_tasks])
+      (*n_tasks)++;
+    return;
+  }
 
-    for (int avail = available; avail && *n_tasks < max_t; avail &= avail - 1) {
-        int bit = avail & (-avail);
-        int num = __builtin_ctz(bit);
+  int box = box_index(row, col, L);
+  int used = row_mask[row] | col_mask[col] | box_mask[box];
+  int available = valid_mask & ~used;
 
-        grid[row * n + col]  = num;
-        row_mask[row]       |= bit;
-        col_mask[col]       |= bit;
-        box_mask[box]       |= bit;
+  for (int avail = available; avail && *n_tasks < max_t; avail &= avail - 1) {
+    int bit = avail & (-avail);
+    int num = __builtin_ctz(bit);
 
-        generate_tasks(grid, row_mask, col_mask, box_mask, n, L,
-                       depth - 1, tasks, n_tasks, max_t);
+    grid[row * n + col] = num;
+    row_mask[row] |= bit;
+    col_mask[col] |= bit;
+    box_mask[box] |= bit;
 
-        grid[row * n + col]  = 0;
-        row_mask[row]       ^= bit;
-        col_mask[col]       ^= bit;
-        box_mask[box]       ^= bit;
-    }
+    generate_tasks(grid, row_mask, col_mask, box_mask, n, L, depth - 1, tasks,
+                   n_tasks, max_t);
+
+    grid[row * n + col] = 0;
+    row_mask[row] ^= bit;
+    col_mask[col] ^= bit;
+    box_mask[box] ^= bit;
+  }
 }
 
 /* =========================================================================
@@ -384,7 +413,8 @@ void generate_tasks(int *grid, int *row_mask, int *col_mask, int *box_mask,
  * ========================================================================= */
 
 /**
- * @brief Resolve o puzzle por backtracking com MRV, forward checking e bitmasks.
+ * @brief Resolve o puzzle por backtracking com MRV, forward checking e
+ * bitmasks.
  *
  * OPTIMIZAÇÕES FACE À VERSÃO ANTERIOR:
  *
@@ -412,52 +442,58 @@ void generate_tasks(int *grid, int *row_mask, int *col_mask, int *box_mask,
  * @return        1 se resolvido, 0 caso contrário.
  */
 int solve_with_cutoff(SubProblem *sp, int n, int L, volatile int *found) {
-    if (*found) return 0;
-
-    /* MRV: seleccionar a célula vazia com menos candidatos válidos.
-     * valid_mask tem os bits 1..n activos. */
-    int valid_mask = (2 << n) - 2;
-    int row = -1, col = -1, min_cnt = n + 1;
-
-    for (int i = 0; i < n && min_cnt > 1; i++) {
-        for (int j = 0; j < n && min_cnt > 1; j++) {
-            if (sp->grid[i * n + j] != 0) continue;
-            int box  = box_index(i, j, L);
-            int used = sp->row_mask[i] | sp->col_mask[j] | sp->box_mask[box];
-            int cnt  = __builtin_popcount(valid_mask & ~used);
-            if (cnt == 0) return 0;  /* Forward checking: célula sem candidatos */
-            if (cnt < min_cnt) { min_cnt = cnt; row = i; col = j; }
-        }
-    }
-
-    if (row == -1) return 1;   /* Nenhuma célula vazia → solução completa */
-
-    int box       = box_index(row, col, L);
-    int used      = sp->row_mask[row] | sp->col_mask[col] | sp->box_mask[box];
-    int available = valid_mask & ~used;
-
-    /* Iterar apenas sobre os candidatos disponíveis via manipulação de bits */
-    for (int avail = available; avail; avail &= avail - 1) {
-        if (*found) return 0;
-
-        int bit = avail & (-avail);   /* bit isolado mais baixo */
-        int num = __builtin_ctz(bit); /* posição do bit = número a colocar */
-
-        sp->grid[row * n + col]  = num;
-        sp->row_mask[row]       |= bit;
-        sp->col_mask[col]       |= bit;
-        sp->box_mask[box]       |= bit;
-
-        if (solve_with_cutoff(sp, n, L, found)) return 1;
-
-        /* Backtrack: repor célula e desactivar bitmasks */
-        sp->grid[row * n + col]  = 0;
-        sp->row_mask[row]       ^= bit;
-        sp->col_mask[col]       ^= bit;
-        sp->box_mask[box]       ^= bit;
-    }
-
+  if (*found)
     return 0;
+
+  int valid_mask = (2 << n) - 2;
+  int row = -1, col = -1, min_cnt = n + 1;
+
+  for (int i = 0; i < n && min_cnt > 1; i++) {
+    for (int j = 0; j < n && min_cnt > 1; j++) {
+      if (sp->grid[i * n + j] != 0)
+        continue;
+      int box = box_index(i, j, L);
+      int used = sp->row_mask[i] | sp->col_mask[j] | sp->box_mask[box];
+      int cnt = __builtin_popcount(valid_mask & ~used);
+      if (cnt == 0)
+        return 0;
+      if (cnt < min_cnt) {
+        min_cnt = cnt;
+        row = i;
+        col = j;
+      }
+    }
+  }
+
+  if (row == -1)
+    return 1;
+
+  int box = box_index(row, col, L);
+  int used = sp->row_mask[row] | sp->col_mask[col] | sp->box_mask[box];
+  int available = valid_mask & ~used;
+
+  for (int avail = available; avail; avail &= avail - 1) {
+    if (*found)
+      return 0;
+
+    int bit = avail & (-avail);
+    int num = __builtin_ctz(bit);
+
+    sp->grid[row * n + col] = num;
+    sp->row_mask[row] |= bit;
+    sp->col_mask[col] |= bit;
+    sp->box_mask[box] |= bit;
+
+    if (solve_with_cutoff(sp, n, L, found))
+      return 1;
+
+    sp->grid[row * n + col] = 0;
+    sp->row_mask[row] ^= bit;
+    sp->col_mask[col] ^= bit;
+    sp->box_mask[box] ^= bit;
+  }
+
+  return 0;
 }
 
 /* =========================================================================
@@ -479,216 +515,187 @@ int solve_with_cutoff(SubProblem *sp, int n, int L, volatile int *found) {
  * @return       0 em caso de sucesso, 1 em caso de erro.
  */
 int main(int argc, char *argv[]) {
-    int id, p;
+  int id, p;
 
-    MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &id);
-    MPI_Comm_size(MPI_COMM_WORLD, &p);
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &id);
+  MPI_Comm_size(MPI_COMM_WORLD, &p);
 
-    /* ------------------------------------------------------------------
-     * COMUNICAÇÃO (Foster §2): Processo 0 lê e faz broadcast do tabuleiro
-     * ------------------------------------------------------------------ */
-    int L = 0, n = 0;
-    int *flat_grid = NULL;
+  int L = 0, n = 0;
+  int *flat_grid = NULL;
 
-    if (id == 0) {
-        if (argc != 2) {
-            fprintf(stderr, "Uso: %s <ficheiro_entrada>\n", argv[0]);
-            L = -1;
-            MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
-            MPI_Finalize(); return 1;
-        }
+  if (id == 0) {
+    if (argc != 2) {
+      fprintf(stderr, "Uso: %s <ficheiro_entrada>\n", argv[0]);
+      L = -1;
+      MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Finalize();
+      return 1;
+    }
 
-        Sudoku *s0 = NULL;
-        if (!read_sudoku(argv[1], &s0)) {
-            L = -1;
-            MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
-            MPI_Finalize(); return 1;
-        }
+    Sudoku *s0 = NULL;
+    if (!read_sudoku(argv[1], &s0)) {
+      L = -1;
+      MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Finalize();
+      return 1;
+    }
 
-        L = s0->L; n = s0->n;
+    L = s0->L;
+    n = s0->n;
 
-        /* Broadcast de L para que os workers alocam a dimensão correcta */
-        MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(s0->grid, n * n, MPI_INT, 0, MPI_COMM_WORLD);
 
-        /* Broadcast do tabuleiro inicial (array plano n*n) */
-        MPI_Bcast(s0->grid, n * n, MPI_INT, 0, MPI_COMM_WORLD);
+    flat_grid = (int *)malloc(n * n * sizeof(int));
+    memcpy(flat_grid, s0->grid, n * n * sizeof(int));
+    free_sudoku(s0);
+  } else {
+    MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    if (L == -1) {
+      MPI_Finalize();
+      return 1;
+    }
 
-        flat_grid = (int *) malloc(n * n * sizeof(int));
-        memcpy(flat_grid, s0->grid, n * n * sizeof(int));
-        free_sudoku(s0);
+    n = L * L;
+    flat_grid = (int *)calloc(n * n, sizeof(int));
+    MPI_Bcast(flat_grid, n * n, MPI_INT, 0, MPI_COMM_WORLD);
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  double tempo = -MPI_Wtime();
+
+  int *row_mask = (int *)calloc(n, sizeof(int));
+  int *col_mask = (int *)calloc(n, sizeof(int));
+  int *box_mask = (int *)calloc(n, sizeof(int));
+
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++) {
+      int val = flat_grid[i * n + j];
+      if (val != 0) {
+        int bit = 1 << val;
+        row_mask[i] |= bit;
+        col_mask[j] |= bit;
+        box_mask[box_index(i, j, L)] |= bit;
+      }
+    }
+
+  int *wgrid = (int *)malloc(n * n * sizeof(int));
+  int *wrow = (int *)malloc(n * sizeof(int));
+  int *wcol = (int *)malloc(n * sizeof(int));
+  int *wbox = (int *)malloc(n * sizeof(int));
+  memcpy(wgrid, flat_grid, n * n * sizeof(int));
+  memcpy(wrow, row_mask, n * sizeof(int));
+  memcpy(wcol, col_mask, n * sizeof(int));
+  memcpy(wbox, box_mask, n * sizeof(int));
+
+  SubProblem **tasks = (SubProblem **)calloc(MAX_TASKS, sizeof(SubProblem *));
+  int n_tasks = 0;
+  generate_tasks(wgrid, wrow, wcol, wbox, n, L, EXPAND_DEPTH, tasks, &n_tasks,
+                 MAX_TASKS);
+
+  free(wgrid);
+  free(wrow);
+  free(wcol);
+  free(wbox);
+  free(row_mask);
+  free(col_mask);
+  free(box_mask);
+
+  int my_count = 0;
+  for (int t = id; t < n_tasks; t += p)
+    my_count++;
+
+  SubProblem **my_tasks = NULL;
+  if (my_count > 0) {
+    my_tasks = (SubProblem **)malloc(my_count * sizeof(SubProblem *));
+    int k = 0;
+    for (int t = id; t < n_tasks; t += p)
+      my_tasks[k++] = tasks[t];
+  }
+
+  volatile int local_found = 0;
+  int *local_result = (int *)calloc(n * n, sizeof(int));
+
+#pragma omp parallel for schedule(dynamic, 1) shared(local_found, local_result)
+  for (int t = 0; t < my_count; t++) {
+    if (local_found)
+      continue;
+
+    SubProblem *sp = my_tasks[t];
+
+    if (solve_with_cutoff(sp, n, L, &local_found)) {
+#pragma omp critical
+      if (!local_found) {
+        memcpy(local_result, sp->grid, n * n * sizeof(int));
+        local_found = 1;
+      }
+    }
+  }
+
+  free(my_tasks);
+  for (int t = 0; t < n_tasks; t++)
+    free_subproblem(tasks[t]);
+  free(tasks);
+
+  int global_solved = 0;
+  int *final_grid = NULL;
+
+  if (id == 0) {
+    if (local_found) {
+      global_solved = 1;
+      final_grid = local_result;
+      local_result = NULL;
     } else {
-        /* Workers recebem L, calculam n e alocam a grid */
-        MPI_Bcast(&L, 1, MPI_INT, 0, MPI_COMM_WORLD);
-        if (L == -1) { MPI_Finalize(); return 1; }
+      final_grid = (int *)malloc(n * n * sizeof(int));
+      MPI_Status status;
 
-        n = L * L;
-        flat_grid = (int *) calloc(n * n, sizeof(int));
-        MPI_Bcast(flat_grid, n * n, MPI_INT, 0, MPI_COMM_WORLD);
-    }
+      for (int w = 1; w < p; w++) {
+        MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-    /* Barreira para medição justa do tempo de computação */
-    MPI_Barrier(MPI_COMM_WORLD);
-    double tempo = -MPI_Wtime();
-
-    /* ------------------------------------------------------------------
-     * PARTICIONAMENTO (Foster §1):
-     * Construir bitmasks locais e gerar o conjunto completo de sub-problemas.
-     * Todos os processos executam este passo de forma independente (sem
-     * comunicação), produzindo o mesmo conjunto de tarefas.
-     * ------------------------------------------------------------------ */
-
-    /* Bitmasks de restrições calculadas localmente a partir do flat_grid */
-    int *row_mask = (int *) calloc(n, sizeof(int));
-    int *col_mask = (int *) calloc(n, sizeof(int));
-    int *box_mask = (int *) calloc(n, sizeof(int));
-
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) {
-            int val = flat_grid[i * n + j];
-            if (val != 0) {
-                int bit = 1 << val;
-                row_mask[i]                |= bit;
-                col_mask[j]                |= bit;
-                box_mask[box_index(i,j,L)] |= bit;
-            }
-        }
-
-    /* Arrays de trabalho para generate_tasks — modificados e restaurados */
-    int *wgrid = (int *) malloc(n * n * sizeof(int));
-    int *wrow  = (int *) malloc(n * sizeof(int));
-    int *wcol  = (int *) malloc(n * sizeof(int));
-    int *wbox  = (int *) malloc(n * sizeof(int));
-    memcpy(wgrid, flat_grid, n * n * sizeof(int));
-    memcpy(wrow,  row_mask,  n * sizeof(int));
-    memcpy(wcol,  col_mask,  n * sizeof(int));
-    memcpy(wbox,  box_mask,  n * sizeof(int));
-
-    SubProblem **tasks = (SubProblem **) calloc(MAX_TASKS, sizeof(SubProblem *));
-    int n_tasks = 0;
-    generate_tasks(wgrid, wrow, wcol, wbox, n, L, EXPAND_DEPTH,
-                   tasks, &n_tasks, MAX_TASKS);
-
-    free(wgrid); free(wrow); free(wcol); free(wbox);
-    free(row_mask); free(col_mask); free(box_mask);
-
-    /* ------------------------------------------------------------------
-     * AGREGAÇÃO + MAPEAMENTO (Foster §3 e §4):
-     * Distribuição cíclica: processo id trata sub-problemas i % p == id.
-     * Threads OpenMP partilham as tarefas locais com dynamic scheduling.
-     * ------------------------------------------------------------------ */
-
-    /* Colectar ponteiros para as tarefas deste processo */
-    int my_count = 0;
-    for (int t = id; t < n_tasks; t += p) my_count++;
-
-    SubProblem **my_tasks = NULL;
-    if (my_count > 0) {
-        my_tasks = (SubProblem **) malloc(my_count * sizeof(SubProblem *));
-        int k = 0;
-        for (int t = id; t < n_tasks; t += p)
-            my_tasks[k++] = tasks[t];
-    }
-
-    volatile int local_found = 0;
-    int *local_result = (int *) calloc(n * n, sizeof(int));
-
-    /* Cada thread resolve sub-problemas atribuídos a este processo;
-     * a primeira a encontrar solução sinaliza as restantes para pararem. */
-    #pragma omp parallel for schedule(dynamic, 1) shared(local_found, local_result)
-    for (int t = 0; t < my_count; t++) {
-        if (local_found) continue;
-
-        SubProblem *sp = my_tasks[t];
-
-        if (solve_with_cutoff(sp, n, L, &local_found)) {
-            #pragma omp critical
-            if (!local_found) {
-                memcpy(local_result, sp->grid, n * n * sizeof(int));
-                local_found = 1;
-            }
-        }
-    }
-
-    free(my_tasks);
-    for (int t = 0; t < n_tasks; t++) free_subproblem(tasks[t]);
-    free(tasks);
-
-    /* ------------------------------------------------------------------
-     * COMUNICAÇÃO (Foster §2) — recolha da solução:
-     * Workers enviam resultado ao mestre (ponto-a-ponto).
-     * Mestre recebe p-1 mensagens e aceita a primeira solução válida.
-     * ------------------------------------------------------------------ */
-    int global_solved = 0;
-    int *final_grid   = NULL;
-
-    if (id == 0) {
-        /* Verificar se o próprio mestre encontrou solução */
-        if (local_found) {
-            global_solved = 1;
-            final_grid    = local_result;
-            local_result  = NULL;   /* evitar double-free */
+        if (status.MPI_TAG == TAG_SOLUCAO && !global_solved) {
+          MPI_Recv(final_grid, n * n, MPI_INT, status.MPI_SOURCE, TAG_SOLUCAO,
+                   MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          global_solved = 1;
+        } else if (status.MPI_TAG == TAG_SOLUCAO) {
+          int *buf = (int *)malloc(n * n * sizeof(int));
+          MPI_Recv(buf, n * n, MPI_INT, status.MPI_SOURCE, TAG_SOLUCAO,
+                   MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          free(buf);
         } else {
-            final_grid = (int *) malloc(n * n * sizeof(int));
-            MPI_Status status;
-
-            /* Receber exactamente p-1 mensagens (uma por worker) */
-            for (int w = 1; w < p; w++) {
-                MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-
-                if (status.MPI_TAG == TAG_SOLUCAO && !global_solved) {
-                    /* Primeira solução válida — aceitar */
-                    MPI_Recv(final_grid, n * n, MPI_INT,
-                             status.MPI_SOURCE, TAG_SOLUCAO,
-                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                    global_solved = 1;
-                } else if (status.MPI_TAG == TAG_SOLUCAO) {
-                    /* Solução duplicada — descartar */
-                    int *buf = (int *) malloc(n * n * sizeof(int));
-                    MPI_Recv(buf, n * n, MPI_INT,
-                             status.MPI_SOURCE, TAG_SOLUCAO,
-                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                    free(buf);
-                } else {
-                    /* Worker sem solução — consumir a mensagem */
-                    int dummy;
-                    MPI_Recv(&dummy, 1, MPI_INT,
-                             status.MPI_SOURCE, TAG_SEM_SOL,
-                             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                }
-            }
+          int dummy;
+          MPI_Recv(&dummy, 1, MPI_INT, status.MPI_SOURCE, TAG_SEM_SOL,
+                   MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
+      }
+    }
 
-        tempo += MPI_Wtime();
+    tempo += MPI_Wtime();
 
-        if (global_solved) {
-            Sudoku tmp = {final_grid, NULL, NULL, NULL, n, L};
-            print_sudoku(&tmp);
-        } else {
-            printf("Nenhuma solução\n");
-        }
-        fflush(stdout);
-        fprintf(stderr, "%.1fs\n", tempo);
-
+    if (global_solved) {
+      Sudoku tmp = {final_grid, NULL, NULL, NULL, n, L};
+      print_sudoku(&tmp);
     } else {
-        /* Workers enviam o seu resultado ao mestre */
-        if (local_found) {
-            MPI_Send(local_result, n * n, MPI_INT, 0, TAG_SOLUCAO,
-                     MPI_COMM_WORLD);
-        } else {
-            int dummy = 0;
-            MPI_Send(&dummy, 1, MPI_INT, 0, TAG_SEM_SOL,
-                     MPI_COMM_WORLD);
-        }
+      printf("Nenhuma solução\n");
     }
+    fflush(stdout);
+    fprintf(stderr, "%.1fs\n", tempo);
 
-    /* ------------------------------------------------------------------
-     * Limpeza de memória
-     * ------------------------------------------------------------------ */
-    free(flat_grid);
-    if (local_result) free(local_result);
-    if (id == 0 && final_grid) free(final_grid);
+  } else {
+    if (local_found) {
+      MPI_Send(local_result, n * n, MPI_INT, 0, TAG_SOLUCAO, MPI_COMM_WORLD);
+    } else {
+      int dummy = 0;
+      MPI_Send(&dummy, 1, MPI_INT, 0, TAG_SEM_SOL, MPI_COMM_WORLD);
+    }
+  }
 
-    MPI_Finalize();
-    return 0;
+  free(flat_grid);
+  if (local_result)
+    free(local_result);
+  if (id == 0 && final_grid)
+    free(final_grid);
+
+  MPI_Finalize();
+  return 0;
 }
