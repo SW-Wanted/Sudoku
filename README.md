@@ -11,7 +11,7 @@ Este trabalho implementa um programa que resolve quebra-cabeças Sudoku.
 |---|---|---|---|
 | ✅ V0 | Serial |  | 23 Mar 2026 |
 | ✅ V1 | Paralela | OpenMP | 21 Abr 2026 |
-| 🔲 V2 | Distribuída | MPI | 15 Junho 2026 |
+| ✅ V2 | Distribuída | MPI + OpenMP | 15 Junho 2026 |
 
 ---
 
@@ -24,8 +24,9 @@ CPD-Sudoku/
 │   └── sudoku-subject.pdf
 |
 ├── sudoku/
+│   ├── sudoku-serial.c
 │   ├── sudoku-omp.c
-│   └── sudoku-serial.c
+│   └── sudoku-mpi.c
 |
 ├── tests/
 │   ├── 9x9-nosol.txt
@@ -42,15 +43,17 @@ CPD-Sudoku/
 
 ## 🔧 Compilação
 
-### Opção 1: Comando directo
+### Opção 1: Comandos directos
 ```bash
 gcc -fopenmp -O2 sudoku/sudoku-serial.c -o sudoku-serial
+gcc -fopenmp -O2 sudoku/sudoku-omp.c -o sudoku-omp
+mpicc -fopenmp -O2 sudoku/sudoku-mpi.c -o sudoku-mpi
 ```
 
 > **Nota:** A flag `-fopenmp` é necessária mesmo na versão serial porque usamos `omp_get_wtime()` para medir o tempo.
 
 ### Opção 2: Comando Make
-Compilar o projecto
+Compilar o projecto (serial + OpenMP + MPI)
 ```bash
 make
 ```
@@ -69,14 +72,15 @@ make clean
 
 ```bash
 ./sudoku-serial <ficheiro_entrada>
+./sudoku-omp <ficheiro_entrada>
+mpirun -np <num_processos> ./sudoku-mpi <ficheiro_entrada>
 ```
 
 ### Exemplos:
 ```bash
 ./sudoku-serial tests/9x9.txt
-```
-```bash
-./sudoku-serial tests/9x9-nosol.txt
+./sudoku-omp tests/9x9.txt
+mpirun -np 4 ./sudoku-mpi tests/9x9.txt
 ```
 ---
 
@@ -171,10 +175,23 @@ Execução directa com os ficheiros presentes no repositório:
 ./sudoku-omp tests/16x16-nosol.txt
 ./sudoku-omp tests/16x16-zeros.txt
 ```
+```bash
+mpirun -np 4 ./sudoku-mpi tests/9x9.txt
+mpirun -np 4 ./sudoku-mpi tests/9x9-nosol.txt
+mpirun -np 4 ./sudoku-mpi tests/16x16.txt
+mpirun -np 4 ./sudoku-mpi tests/16x16-nosol.txt
+mpirun -np 4 ./sudoku-mpi tests/16x16-zeros.txt
+```
+
+Ou via Makefile:
+```bash
+make test-mpi
+```
 
 ### Separar saída e tempo:
 ```bash
 ./sudoku-serial tests/9x9.txt > solucao.txt 2> tempo.txt
+mpirun -np 4 ./sudoku-mpi tests/9x9.txt > solucao.txt 2> tempo.txt
 ```
 
 ```bash
