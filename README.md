@@ -1,4 +1,4 @@
-# 🧩 Sudoku Solver - Implementação Serial e Paralela (OpenMP)
+# 🧩 Sudoku Solver
 
 Este projeto foi criado como parte da **Componente Prática do Exame** da disciplina de **Computação Paralela e Distribuída** durante o ano lectivo **2025/2026** na turma **EIN6_M3** pelo [**Grupo 04**](./CONTRIBUTORS.md).
 
@@ -10,31 +10,31 @@ Este trabalho implementa um programa que resolve quebra-cabeças Sudoku.
 | Fase | Versão | Tecnologia | Prazo |
 |---|---|---|---|
 | ✅ V0 | Serial |  | 23 Mar 2026 |
-| 🔲 V1 | Paralela | OpenMP | 21 Abr 2026 |
-| 🔲 V2 | Distribuída | MPI | 18 Mai 2026 |
+| ✅ V1 | Paralela | OpenMP | 21 Abr 2026 |
+| 🔲 V2 | Distribuída | MPI | 15 Junho 2026 |
 
 ---
 
 ## 🗂️ Estrutura do Projecto
 
 ```
-CPD-MiniProjectos/
+CPD-Sudoku/
 ├── docs/
-│   └── CPD2025_2026-Projecto-v0.pdf
+│   ├── sudoku-report.pdf
+│   └── sudoku-subject.pdf
+|
 ├── sudoku/
-│   ├── paralela
-│   │   └── sudoku-omp.c
-│   └── serial/
-│       └── sudoku-serial.c
+│   ├── sudoku-mpi.c
+│   ├── sudoku-omp.c
+│   └── sudoku-serial.c
+|
 ├── tests/
-│   ├── input_4x4.txt
-│   ├── input_4x4_impossible.txt
-│   ├── input_9x9.txt
-│   ├── 9x9.txt
 │   ├── 9x9-nosol.txt
-│   ├── 16x16.txt
+│   ├── 9x9.txt
 │   ├── 16x16-nosol.txt
-│   └── 16x16-zeros.txt
+│   ├── 16x16-zeros.txt
+│   └── 16x16.txt
+|
 ├── Makefile
 └── README.md
 ```
@@ -45,7 +45,7 @@ CPD-MiniProjectos/
 
 ### Opção 1: Comando directo
 ```bash
-gcc -fopenmp -O2 sudoku/serial/sudoku-serial.c -o sudoku-serial
+gcc -fopenmp -O2 sudoku/sudoku-serial.c -o sudoku-serial
 ```
 
 > **Nota:** A flag `-fopenmp` é necessária mesmo na versão serial porque usamos `omp_get_wtime()` para medir o tempo.
@@ -74,10 +74,10 @@ make clean
 
 ### Exemplos:
 ```bash
-./sudoku-serial tests/input_4x4.txt
+./sudoku-serial tests/9x9.txt
 ```
 ```bash
-./sudoku-serial tests/input_4x4_impossible.txt
+./sudoku-serial tests/9x9-nosol.txt
 ```
 ---
 
@@ -132,98 +132,32 @@ Nenhuma solução
 
 ## 🧪 Testes Realizados
 
-Testamos com oito tipos de casos:
+Testamos com cinco tipos de casos:
 
-### 1. **input_4x4.txt** - Sudoku Básico
-```text
-2
-0 0 3 1
-3 0 0 0
-4 2 0 0
-1 3 0 2
-```
-- Resolve instantaneamente (~0.0s)
-- Sudoku 4×4 com solução válida
+### 1. **9x9.txt** - Sudoku 9×9
+- Instância de teste usada para validar a versão serial e a versão paralela
+- Boa para confirmar leitura, validação e preenchimento do tabuleiro
 
-### 2. **input_4x4_impossible.txt** - Caso Impossível
-
-```text
-2
-1 2 3 4
-1 0 0 0
-0 0 0 0
-0 0 0 0
-```
+### 2. **9x9-nosol.txt** - Sudoku 9×9 sem solução
 - Detecta correctamente que não há solução
 - Imprime "Nenhuma solução"
 
-Este Sudoku é impossível porque:
-- Linha 0: `[1, 2, 3, 4]`
-- Linha 1: `[1, _, _, _]`
-- O número **1 já está na coluna 0**, tornando impossível preencher a posição [1,0]
-
-### 3. **input_9x9.txt** - Sudoku Complexo
-```text
-3
-5 3 0 0 7 0 0 0 0
-6 0 0 1 9 5 0 0 0
-0 9 8 0 0 0 0 6 0
-8 0 0 0 6 0 0 0 3
-4 0 0 8 0 3 0 0 1
-7 0 0 0 2 0 0 0 6
-0 6 0 0 0 0 2 8 0
-0 0 0 4 1 9 0 0 5
-0 0 0 0 8 0 0 7 9
-```
-- Demora alguns segundos dependendo da dificuldade
-- Sudoku 9×9 com solução válida
-
-### 4. **9x9.txt** - Sudoku 9×9 (esparso)
-- Instância 9×9 com poucas pistas distribuídas
-- Útil para medir esforço de pesquisa com baixa restrição
-
-### 5. **9x9-nosol.txt** - Sudoku 9×9 sem solução
-- Instância propositalmente impossível
-- Valida deteção de inconsistência sem solução
-
-### 6. **16x16.txt** - Sudoku 16×16
-- Instância 16×16 (L=4) para testar escalabilidade
+### 3. **16x16.txt** - Sudoku 16×16
+- Instância 16×16 para testar escalabilidade
 - Pode demorar significativamente mais que 9×9
 
-### 7. **16x16-nosol.txt** - Sudoku 16×16 sem solução
+### 4. **16x16-nosol.txt** - Sudoku 16×16 sem solução
 - Caso impossível em dimensão maior
 - Verifica deteção de falhas em 16×16
 
-### 8. **16x16-zeros.txt** - Sudoku 16×16 vazio (stress)
+### 5. **16x16-zeros.txt** - Sudoku 16×16 vazio (stress)
 - Sem pistas iniciais (pior caso)
 - Útil para stress e medições de desempenho
 ---
   
 ### Comandos de Testes
  
-4×4 com solução:
-```bash
-make test1  
-```
-4×4 impossível:
-```bash
-make test2
-```
-9×9 com solução:
-```bash
-make test3-omp
-```
-executa os oitos testes (versão serial):
-```bash
-make test
-```
-
-executa os oitos testes (versão paralela):
-```bash
-make test-omp
-```
-
-Outros testes (execução directa):
+Execução directa com os ficheiros presentes no repositório:
 ```bash
 ./sudoku-serial tests/9x9.txt
 ./sudoku-serial tests/9x9-nosol.txt
@@ -241,7 +175,7 @@ Outros testes (execução directa):
 
 ### Separar saída e tempo:
 ```bash
-./sudoku-serial tests/input_4x4.txt > solucao.txt 2> tempo.txt
+./sudoku-serial tests/9x9.txt > solucao.txt 2> tempo.txt
 ```
 
 ```bash
@@ -320,20 +254,21 @@ Calcular o bloco correcto foi a parte mais complicada. Testamos várias abordage
 No início não tínhamos certeza de como usar `omp_get_wtime()` correctamente. Depois de ler a documentação do OpenMP percebemos o esquema do tempo negativo + tempo positivo.
 
 **Detecção de Casos Impossíveis**  
-Garantir que o algoritmo detecta correctamente casos sem solução. Testamos com o ficheiro `input_impossible.txt` e verificamos que funciona como esperado.
+Garantir que o algoritmo detecta correctamente casos sem solução. Testamos com os ficheiros `9x9-nosol.txt` e `16x16-nosol.txt` e verificamos que funciona como esperado.
 
 ---
 
 ## 📊 Resultados
 
 ### Performance:
-- **input_4×4.txt:** ~0.0s
-- **input_4x4_impossible.txt:** ~0.0s (detecção rápida)
-- **input_9×9.txt:** ~0.0s a 0.1s (dependendo da dificuldade)
+- **9x9.txt:** ~0.0s a 0.1s (dependendo da dificuldade)
+- **9x9-nosol.txt:** ~0.0s (detecção rápida)
+- **16x16.txt:** pode demorar significativamente mais
+- **16x16-nosol.txt:** detecção rápida de inconsistência
+- **16x16-zeros.txt:** caso de stress, mais pesado
 
 ### Correcção:
-- ✅ Resolve Sudokus 4×4 correctamente
-- ✅ Resolve Sudokus 9×9 correctamente
+- ✅ Resolve os Sudokus dos ficheiros de teste correctamente
 - ✅ Detecta casos sem solução correctamente
 - ✅ Não tem memory leaks (verificado com valgrind)
 
