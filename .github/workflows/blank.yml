@@ -10,6 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install MPI
+        run: sudo apt-get install -y libopenmpi-dev openmpi-bin
+
       - name: Build project
         run: make
 
@@ -18,3 +21,6 @@ jobs:
 
       - name: Run OpenMP tests
         run: make test-omp
+
+      - name: Run MPI tests
+        run: make test-mpi
