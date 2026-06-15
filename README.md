@@ -24,9 +24,9 @@ CPD-Sudoku/
 │   └── sudoku-subject.pdf
 |
 ├── sudoku/
-│   ├── sudoku-serial.c
+│   ├── sudoku-mpi.c
 │   ├── sudoku-omp.c
-│   └── sudoku-mpi.c
+│   └── sudoku-serial.c
 |
 ├── tests/
 │   ├── 9x9-nosol.txt
