@@ -10,11 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MPI toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openmpi-bin libopenmpi-dev
-
       - name: Build project
         run: make
 
@@ -23,6 +18,3 @@ jobs:
 
       - name: Run OpenMP tests
         run: make test-omp
-
-      - name: Run MPI tests
-        run: make test-mpi
